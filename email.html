@@ -51,7 +51,7 @@ function checkEmail() {
 
     result.innerHTML = "Checking...";
 
-    fetch(`https://api.apilayer.com/email_verification/=${email}`, {
+    fetch(`https://api.apilayer.com/email_verification/${email}`, {
         headers: { "apikey": "N2eYdpoV5D3TaTNDaIzxSKStMXYTl8CU" }
     })
     .then(res => res.json())
@@ -70,6 +70,7 @@ function checkEmail() {
     });
 }
 </script>
+
 
 </body>
 </html>
