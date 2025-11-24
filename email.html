@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Email Verification</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f3f3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px;
+      width: 350px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      background: #007bff;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .result {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #eef;
+      font-size: 14px;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Email Verification</h2>
+  <input type="email" id="email" placeholder="Enter email address">
+  <button onclick="verifyEmail()">Verify Email</button>
+
+  <div class="result" id="result"></div>
+</div>
+
+<script>
+function verifyEmail() {
+  let email = document.getElementById("email").value;
+  let resultBox = document.getElementById("result");
+
+  if (!email) {
+    resultBox.innerHTML = "Please enter an email!";
+    return;
+  }
+
+  resultBox.innerHTML = "Checking...";
+
+  var myHeaders = new Headers();
+  myHeaders.append("apikey", "N2eYdpoV5D3TaTNDaIzxSKStMXYTl8CU");
+
+  fetch(`https://api.apilayer.com/email_verification/email?email=${email}`, {
+    method: 'GET',
+    redirect: 'follow',
+    headers: myHeaders
+  })
+  .then(response => response.json())
+  .then(data => {
+    resultBox.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+  })
+  .catch(error => {
+    resultBox.innerHTML = "Error: " + error;
+  });
+}
+</script>
+
+</body>
+</html>
