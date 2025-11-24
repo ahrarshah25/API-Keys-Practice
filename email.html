@@ -1,76 +1,76 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Email Checker</title>
+<meta charset="UTF-8">
+<title>Email Verification</title>
 <style>
-body {
-    background: #f5f5f5;
-    font-family: Arial;
-}
-.box {
-    width: 350px;
-    padding: 20px;
-    background: #fff;
-    margin: 50px auto;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-input, button {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-}
-button {
-    background: #0080ff;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-}
-.result {
-    padding: 10px;
-    text-align: center;
-    font-weight: bold;
-}
+body { font-family: Arial; background: #f5f5f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+.container { background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 400px; }
+input, button { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ccc; }
+button { background: #0080ff; color: #fff; border: none; cursor: pointer; }
+button:hover { background: #0056b3; }
+.result { padding: 10px; font-weight: bold; word-wrap: break-word; }
 </style>
 </head>
 <body>
 
-<div class="box">
-    <h2>Email Verification</h2>
-    <input type="email" id="email" placeholder="Enter Email">
-    <button onclick="checkEmail()">Check</button>
-    <div class="result" id="result"></div>
+<div class="container">
+  <h2>Email Verification</h2>
+  <input type="email" id="email" placeholder="Enter email">
+  <button onclick="checkEmail()">Verify</button>
+  <div class="result" id="result"></div>
 </div>
 
 <script>
-function checkEmail() {
-    let email = document.getElementById("email").value;
-    let result = document.getElementById("result");
+async function checkEmail() {
+  const email = document.getElementById('email').value;
+  const resultDiv = document.getElementById('result');
 
-    result.innerHTML = "Checking...";
+  if (!email) {
+    resultDiv.innerHTML = "⚠️ Please enter an email!";
+    return;
+  }
 
-    fetch(`https://api.apilayer.com/email_verification/${email}`, {
-        headers: { "apikey": "N2eYdpoV5D3TaTNDaIzxSKStMXYTl8CU" }
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.format_valid && data.smtp_check) {
-            result.style.color = "green";
-            result.innerHTML = "✅ Valid Email";
-        } else {
-            result.style.color = "red";
-            result.innerHTML = "❌ Invalid Email";
-        }
-    })
-    .catch(() => {
-        result.style.color = "red";
-        result.innerHTML = "API error — check your key.";
+  resultDiv.innerHTML = "Checking...";
+
+  try {
+    const response = await fetch(`https://api.apilayer.com/email_verification/${email}`, {
+      headers: { "apikey": "N2eYdpoV5D3TaTNDaIzxSKStMXYTl8CU" }
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Ab data variables me hai
+    const isDeliverable = data.is_deliverable;
+    const isSyntaxValid = data.syntax_valid;
+    const canConnectSMTP = data.can_connect_smtp;
+    const isRoleAccount = data.is_role_account;
+
+    // Result show karna
+    if (isSyntaxValid && isDeliverable) {
+      resultDiv.style.color = "green";
+      resultDiv.innerHTML = `
+        ✅ Email is valid!<br>
+        SMTP Connect: ${canConnectSMTP}<br>
+        Role Account: ${isRoleAccount}<br>
+        Domain: ${data.domain}<br>
+        Score: ${data.score}
+      `;
+    } else {
+      resultDiv.style.color = "red";
+      resultDiv.innerHTML = "❌ Invalid Email or not deliverable";
+    }
+
+  } catch (err) {
+    resultDiv.style.color = "red";
+    resultDiv.innerHTML = `Error: ${err.message}`;
+  }
 }
 </script>
-
 
 </body>
 </html>
